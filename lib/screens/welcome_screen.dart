@@ -1,7 +1,9 @@
-import 'package:flash_chat/Components/RoundedButton.dart';
+import 'package:flash_chat/constants.dart';
 import 'package:flash_chat/screens/login_screen.dart';
 import 'package:flash_chat/screens/registration_screen.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 class WelcomeScreen extends StatefulWidget {
   static const String id = "welcomeScreen";
@@ -39,46 +41,60 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Row(
-              children: <Widget>[
-                Hero(
-                  tag: "logo",
-                  child: Container(
-                    child: Image.asset('images/logo.png'),
-                    height: 60,
-                  ),
-                ),
-                Text(
-                  'Flash Chat',
-                  style: TextStyle(
-                    fontSize: 45.0,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-              ],
+            Flexible(
+              child: Lottie.asset(
+                'Anim/animation.json',
+              ),
             ),
+//            Row(
+//              children: <Widget>[
+//                Hero(
+//                  tag: "logo",
+//                  child: Container(
+//                    child: Image.asset('images/logo.png'),
+//                    height: 60,
+//                  ),
+//                ),
+//                Text(
+//                  'Quick Chat',
+//                  style: TextStyle(
+//                    fontSize: 45.0,
+//                    fontWeight: FontWeight.w900,
+//                  ),
+//                ),
+//              ],
+//            ),
             SizedBox(
               height: 48.0,
             ),
-            RoundedButton(
-                title: "Log In",
-                color: Colors.lightBlueAccent,
+            Container(
+              decoration: KButtonDecoration,
+              child: FlatButton(
+                  child: Text("Log In"),
+                  onPressed: () {
+                    Navigator.pushNamed(context, LoginScreen.id);
+                  }),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Container(
+              decoration: KButtonDecoration,
+              child: FlatButton(
+                child: Text("Register"),
                 onPressed: () {
-                  Navigator.pushNamed(context, LoginScreen.id);
-                }),
-            RoundedButton(
-              title: "Register",
-              color: Colors.blueAccent,
-              onPressed: () {
-                Navigator.pushNamed(context, RegistrationScreen.id);
-              },
+                  Navigator.pushNamed(context, RegistrationScreen.id);
+                },
+              ),
+            ),
+            SizedBox(
+              height: 10,
             ),
           ],
         ),

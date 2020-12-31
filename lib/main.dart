@@ -1,14 +1,13 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flash_chat/screens/chat_screen.dart';
 import 'package:flash_chat/screens/login_screen.dart';
 import 'package:flash_chat/screens/registration_screen.dart';
 import 'package:flash_chat/screens/welcome_screen.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-bool hasLoggedUser = false;
-final _auth = FirebaseAuth.instance;
+String token;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,14 +18,18 @@ Future<void> main() async {
 
 Future<void> getCurrentUSer() async {
   SharedPreferences _prefs = await SharedPreferences.getInstance();
-  hasLoggedUser = _prefs.getBool("hasLoggedUser") ?? false;
+  token = _prefs.getString("token") ?? null;
 }
 
 class FlashChat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      initialRoute: hasLoggedUser ? ChatScreen.id : WelcomeScreen.id,
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData.dark().copyWith(
+        scaffoldBackgroundColor: Color(0xFF0C161E),
+      ),
+      initialRoute: (token != null) ? ChatScreen.id : WelcomeScreen.id,
       routes: {
         WelcomeScreen.id: (context) => WelcomeScreen(),
         RegistrationScreen.id: (context) => RegistrationScreen(),

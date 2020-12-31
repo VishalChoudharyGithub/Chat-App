@@ -1,12 +1,21 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:convert';
+
+import 'package:flash_chat/Components/MessageBubble.dart';
+import 'package:flash_chat/Services/Encryption.dart';
+import 'package:flash_chat/Services/Networking.dart';
+import 'package:flash_chat/Services/Prefs.dart';
+import 'package:flash_chat/Services/SocketService.dart';
+import 'package:flash_chat/Services/StreamSocket.dart';
 import 'package:flash_chat/constants.dart';
 import 'package:flash_chat/screens/login_screen.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
-final _firestore = FirebaseFirestore.instance;
-User loggedInUser;
+String _loggedInUser, _loggedEmail;
+StreamSocket streamSocket;
+List<MessageBubble> messageBubbles;
 
 class ChatScreen extends StatefulWidget {
   static const String id = "chatScreen";
@@ -16,99 +25,173 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  SharedPreferences _prefs;
-  String message = "";
   final messageTextController = TextEditingController();
-  final _auth = FirebaseAuth.instance;
+  NetworkHelper networkHelper;
+  SocketService socketService;
+  Encryption encryption;
+  Prefs _prefs;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    getCurrentUSer();
-    getSharedPrefernece();
+    messageBubbles = [];
+
+    _prefs = Prefs();
+    streamSocket = StreamSocket();
+    networkHelper = NetworkHelper();
+    encryption = Encryption();
+    socketService = SocketService(streamSocket);
+
+    getCurrentUser();
+//    handleSocket();
   }
 
-  void getSharedPrefernece() async {
-    _prefs = await SharedPreferences.getInstance();
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    socketService.disposeSocket();
+    super.dispose();
   }
 
-  void getCurrentUSer() async {
-    try {
-      final user = _auth.currentUser;
-      if (user != null) {
-        loggedInUser = user;
-      }
-    } catch (e) {
-      print(e);
+  void getCurrentUser() async {
+    _loggedInUser = await _prefs.getLoggedInUser();
+    _loggedEmail = await _prefs.getLoggedInEmail();
+
+    if (_loggedInUser == null || _loggedEmail == null) {
+      await _prefs.clear();
+      Navigator.popAndPushNamed(context, LoginScreen.id);
     }
+    loadMessages();
+  }
+
+  void loadMessages() async {
+    http.Response response = await networkHelper.getMessages();
+    List<dynamic> messagesList = jsonDecode(response.body);
+
+    streamSocket.addToStream(messagesList, context);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: null,
-        actions: <Widget>[
-          IconButton(
-              icon: Icon(Icons.close),
-              onPressed: () {
-                _auth.signOut().whenComplete(() {
-                  _prefs.setBool("hasLoggedUser", false);
-                  Navigator.popAndPushNamed(context, LoginScreen.id);
-                });
-              }),
-        ],
-        title: Text('⚡️Chat'),
-        backgroundColor: Colors.lightBlueAccent,
-      ),
-      body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            MessagesStream(),
-            Container(
-              decoration: kMessageContainerDecoration,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Expanded(
-                    child: TextField(
-                      controller: messageTextController,
-                      onChanged: (value) {
-                        message = value;
-                      },
-                      decoration: kMessageTextFieldDecoration,
-                    ),
-                  ),
-                  FlatButton(
-                    onPressed: () {
-                      messageTextController.clear();
-                      _firestore
-                          .collection("messages")
-                          .add({"text": message, "sender": loggedInUser.email});
-                    },
-                    child: Text(
-                      'Send',
-                      style: kSendButtonTextStyle,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+    return ChangeNotifierProvider<ProviderData>(
+      create: (context) => ProviderData(),
+      child: Scaffold(
+        appBar: AppBar(
+          primary: true,
+          shape: RoundedRectangleBorder(),
+          centerTitle: true,
+          elevation: 8,
+          leading: null,
+          actions: <Widget>[
+            IconButton(
+                icon: Icon(Icons.close),
+                onPressed: () async {
+                  bool isCleared = await _prefs.clear();
+                  if (isCleared) {
+                    Navigator.popAndPushNamed(context, LoginScreen.id);
+                  }
+                }),
           ],
+          title: Text('Chat'),
+          backgroundColor: Color(0xff0C161E),
+        ),
+        body: SafeArea(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              MessagesStream(
+                networkHelper: networkHelper,
+                token: _loggedInUser,
+              ),
+              Container(
+                decoration: kMessageContainerDecoration.copyWith(),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Expanded(
+                      child: TextField(
+                        controller: messageTextController,
+                        decoration: kMessageTextFieldDecoration,
+                      ),
+                    ),
+                    FlatButton(
+                      onPressed: () async {
+                        String message = messageTextController.text.trim();
+                        if (message.length > 0) {
+                          messageTextController.clear();
+                          socketService.getsocket().emit(
+                              "message_sent",
+                              jsonEncode({
+                                "message": encryption.encrypt(message),
+                                "token": _loggedInUser
+                              }));
+                        }
+                      },
+                      child: Icon(
+                        Icons.send,
+                        color: Colors.blueAccent,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class MessagesStream extends StatelessWidget {
+class MessagesStream extends StatefulWidget {
+  final NetworkHelper networkHelper;
+  final String token;
+
+  MessagesStream({this.networkHelper, this.token});
+
+  @override
+  _MessagesStreamState createState() => _MessagesStreamState();
+}
+
+class _MessagesStreamState extends State<MessagesStream> {
+  ScrollController _scrollController;
+  bool showLoader = false;
+  NetworkHelper networkHelper;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    networkHelper = widget.networkHelper;
+    _scrollController = ScrollController();
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        setState(() {
+          showLoader = true;
+        });
+        loadMoreMessages();
+      }
+    });
+  }
+
+  void loadMoreMessages() async {
+    http.Response response = await networkHelper.getMessages();
+    if (response.statusCode == 200) {
+      List<dynamic> messagesList = jsonDecode(response.body);
+      streamSocket.addToPreviousStream(messagesList);
+      setState(() {
+        showLoader = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: _firestore.collection("messages").snapshots(),
+    return StreamBuilder<Map<String, dynamic>>(
+      stream: streamSocket.getStream,
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return Expanded(
@@ -119,25 +202,26 @@ class MessagesStream extends StatelessWidget {
             ),
           );
         }
-        final messages = snapshot.data.docs.reversed;
-        List<MessageBubble> messageBubbles = [];
-        for (var message in messages) {
-          final messageText = message.data()["text"];
-          final messageSender = message.data()["sender"];
-          final currentUser = loggedInUser.email;
-
-          final messageBubble = MessageBubble(
-            sender: messageSender,
-            text: messageText,
-            isMe: currentUser == messageSender,
-          );
-          messageBubbles.add(messageBubble);
-        }
         return Expanded(
-          child: ListView(
+          child: ListView.builder(
+            physics: BouncingScrollPhysics(),
+            controller: _scrollController,
+            itemCount: messageBubbles.length + 1,
+            cacheExtent: 100.0,
             reverse: true,
             padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-            children: messageBubbles,
+            itemBuilder: (context, index) {
+              if (index == messageBubbles.length) {
+                return showLoader
+                    ? Center(
+                        child: CircularProgressIndicator(
+                          backgroundColor: Colors.lightBlueAccent,
+                        ),
+                      )
+                    : SizedBox();
+              }
+              return messageBubbles[(messageBubbles.length - 1) - index];
+            },
           ),
         );
       },
@@ -145,43 +229,10 @@ class MessagesStream extends StatelessWidget {
   }
 }
 
-class MessageBubble extends StatelessWidget {
-  MessageBubble({this.sender, this.text, this.isMe});
-  final String sender, text;
-  final bool isMe;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(10),
-      child: Column(
-        crossAxisAlignment:
-            isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            sender,
-            style: TextStyle(
-              fontSize: 10,
-              color: Colors.black54,
-            ),
-          ),
-          Material(
-            borderRadius: BorderRadius.circular(30.0),
-            elevation: 5,
-            color: isMe ? Colors.lightBlueAccent : Colors.white,
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-              child: Text(
-                "$text",
-                style: TextStyle(
-                  color: isMe ? Colors.white : Colors.black54,
-                  fontSize: 15,
-                ),
-              ),
-            ),
-          )
-        ],
-      ),
-    );
+class ProviderData extends ChangeNotifier {
+  bool showLoader = true;
+  void hideLoader() {
+    showLoader = false;
+    notifyListeners();
   }
 }

@@ -1,8 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flash_chat/Components/RoundedButton.dart';
+import 'dart:convert';
+
+import 'package:flash_chat/Services/Networking.dart';
 import 'package:flash_chat/constants.dart';
 import 'package:flash_chat/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -13,13 +15,26 @@ class RegistrationScreen extends StatefulWidget {
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
-  final _auth = FirebaseAuth.instance;
   bool showSpinner = false;
   String email = "", password = "";
+  NetworkHelper networkHelper;
+  SharedPreferences _prefs;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    networkHelper = NetworkHelper();
+    getSharedPrefernece();
+  }
+
+  void getSharedPrefernece() async {
+    _prefs = await SharedPreferences.getInstance();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       body: ModalProgressHUD(
         inAsyncCall: showSpinner,
         child: Padding(
@@ -62,38 +77,49 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               SizedBox(
                 height: 24.0,
               ),
-              RoundedButton(
-                  title: "Register",
-                  color: Colors.blueAccent,
-                  onPressed: () async {
-                    setState(() {
-                      showSpinner = true;
-                    });
-                    try {
-                      final newUser =
-                          await _auth.createUserWithEmailAndPassword(
-                              email: email, password: password);
-                      if (newUser != null) {
-                        SharedPreferences _prefs =
-                            await SharedPreferences.getInstance();
-                        _prefs.setBool("hasLoggedUser", true);
-                        Navigator.popAndPushNamed(context, ChatScreen.id);
-                      }
+              Container(
+                decoration: KButtonDecoration,
+                child: FlatButton(
+                    child: Text("Register"),
+                    onPressed: () async {
+                      if (isUserValid()) {
+                        setState(() {
+                          showSpinner = true;
+                        });
+                        try {
+                          http.Response response = await networkHelper
+                              .registerUser(email: email, password: password);
+                          if (response.statusCode == 200) {
+                            var responseEmail =
+                                jsonDecode(response.body)["email"];
+                            var responseToken =
+                                response.headers["x-auth-token"];
 
-                      setState(() {
-                        showSpinner = false;
-                      });
-                    } catch (e) {
-                      print(e);
-                      setState(() {
-                        showSpinner = false;
-                      });
-                    }
-                  }),
+                            _prefs.setString("token", responseToken.toString());
+                            _prefs.setString("email", responseEmail);
+                            Navigator.popAndPushNamed(context, ChatScreen.id);
+                          }
+
+                          setState(() {
+                            showSpinner = false;
+                          });
+                        } catch (e) {
+                          print(e);
+                          setState(() {
+                            showSpinner = false;
+                          });
+                        }
+                      }
+                    }),
+              ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  bool isUserValid() {
+    return (email.length > 1 && password.length > 5);
   }
 }
