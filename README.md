@@ -1,5 +1,5 @@
 ** 𝐒𝐂𝐑𝐄𝐄𝐍𝐒𝐇𝐎𝐓𝐒 **
-![1](https://user-images.githubusercontent.com/47331674/104931465-740ad700-59cc-11eb-87ac-702f9302393d.png)![2](https://user-images.githubusercontent.com/47331674/104931483-7a00b800-59cc-11eb-98e0-2a7a45aa0a3b.png)![3](https://user-images.githubusercontent.com/47331674/104931496-7d943f00-59cc-11eb-9567-b92e7c29592e.png)![4](https://user-images.githubusercontent.com/47331674/104931504-7ff69900-59cc-11eb-9b89-30206729c940.png)
+![Group 1](https://user-images.githubusercontent.com/47331674/104933084-72421300-59ce-11eb-851c-c3d2991eca38.png)
 
 ** 𝗢𝗩𝗘𝗥𝗩𝗜𝗘𝗪 **
 This app is a chat app developed in fast growing flutter UI tookit and backend is powered 
@@ -11,6 +11,7 @@ APPLICATION
 This is a chat app developed in flutter
 
 ** 𝐅𝐥𝐮𝐭𝐭𝐞𝐫 **
+https://www.google.com/url?sa=i&url=https%3A%2F%2Fstrattonapps.com%2Fmobile-development%2Fflutter%2Fflutter-essentials%2F&psig=AOvVaw0Gr-G0irM8FM6JHSb7Y1Ol&ust=1611069588560000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCJCK2Pfjpe4CFQAAAAAdAAAAABAD
 Flutter is Google’s UI toolkit for building beautiful, natively compiled applications for 
 mobile, web, and desktop from a single codebase.
 
@@ -18,6 +19,7 @@ BACKEND
 Backend of this app is built in NodeJS 
 
 ** 𝐍𝐨𝐝𝐞𝐉𝐒 **
+https://www.google.com/url?sa=i&url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FNode.js&psig=AOvVaw2hwB8zPI3mSUeL7w4g_5Qv&ust=1611069616690000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCOixs4Xkpe4CFQAAAAAdAAAAABAD
 Node.js is an open-source, cross-platform, JavaScript runtime environment. 
 It executes JavaScript code outside of a browser.
 
@@ -25,5 +27,6 @@ DATABASE
 For storing messages and user information, this app uses MongoDB.
 
 ** 𝐌𝐨𝐧𝐠𝐨𝐃𝐁 **
+https://www.bloorresearch.com/wp-content/uploads/2013/03/MONGO-DB-logo-300x470--x.png
 MongoDB is a cross-platform document-oriented database program. Classified as a NoSQL database program, 
 MongoDB uses JSON-like documents with optional schemas.
