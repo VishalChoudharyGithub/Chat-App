@@ -1,8 +1,5 @@
 ** 𝐒𝐂𝐑𝐄𝐄𝐍𝐒𝐇𝐎𝐓𝐒 **
-![1](https://user-images.githubusercontent.com/47331674/104931465-740ad700-59cc-11eb-87ac-702f9302393d.png)
-![2](https://user-images.githubusercontent.com/47331674/104931483-7a00b800-59cc-11eb-98e0-2a7a45aa0a3b.png)
-![3](https://user-images.githubusercontent.com/47331674/104931496-7d943f00-59cc-11eb-9567-b92e7c29592e.png)
-![4](https://user-images.githubusercontent.com/47331674/104931504-7ff69900-59cc-11eb-9b89-30206729c940.png)
+![1](https://user-images.githubusercontent.com/47331674/104931465-740ad700-59cc-11eb-87ac-702f9302393d.png)![2](https://user-images.githubusercontent.com/47331674/104931483-7a00b800-59cc-11eb-98e0-2a7a45aa0a3b.png)![3](https://user-images.githubusercontent.com/47331674/104931496-7d943f00-59cc-11eb-9567-b92e7c29592e.png)![4](https://user-images.githubusercontent.com/47331674/104931504-7ff69900-59cc-11eb-9b89-30206729c940.png)
 
 ** 𝗢𝗩𝗘𝗥𝗩𝗜𝗘𝗪 **
 This app is a chat app developed in fast growing flutter UI tookit and backend is powered 
