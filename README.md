@@ -11,7 +11,7 @@ APPLICATION
 This is a chat app developed in flutter
 
 ** 𝐅𝐥𝐮𝐭𝐭𝐞𝐫 **
-https://www.google.com/url?sa=i&url=https%3A%2F%2Fstrattonapps.com%2Fmobile-development%2Fflutter%2Fflutter-essentials%2F&psig=AOvVaw0Gr-G0irM8FM6JHSb7Y1Ol&ust=1611069588560000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCJCK2Pfjpe4CFQAAAAAdAAAAABAD
+![flutter-logo-sharing](https://user-images.githubusercontent.com/47331674/104933785-57bc6980-59cf-11eb-82d4-48005ce43b77.png)
 Flutter is Google’s UI toolkit for building beautiful, natively compiled applications for 
 mobile, web, and desktop from a single codebase.
 
@@ -19,7 +19,7 @@ BACKEND
 Backend of this app is built in NodeJS 
 
 ** 𝐍𝐨𝐝𝐞𝐉𝐒 **
-https://www.google.com/url?sa=i&url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FNode.js&psig=AOvVaw2hwB8zPI3mSUeL7w4g_5Qv&ust=1611069616690000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCOixs4Xkpe4CFQAAAAAdAAAAABAD
+![1200px-Node js_logo svg](https://user-images.githubusercontent.com/47331674/104933789-58ed9680-59cf-11eb-9618-fdb642dd111c.png)
 Node.js is an open-source, cross-platform, JavaScript runtime environment. 
 It executes JavaScript code outside of a browser.
 
@@ -27,6 +27,6 @@ DATABASE
 For storing messages and user information, this app uses MongoDB.
 
 ** 𝐌𝐨𝐧𝐠𝐨𝐃𝐁 **
-https://www.bloorresearch.com/wp-content/uploads/2013/03/MONGO-DB-logo-300x470--x.png
+![MONGO-DB-logo-300x470--x](https://user-images.githubusercontent.com/47331674/104933797-5ab75a00-59cf-11eb-8fee-161574e7914e.png)
 MongoDB is a cross-platform document-oriented database program. Classified as a NoSQL database program, 
 MongoDB uses JSON-like documents with optional schemas.
