@@ -19,7 +19,7 @@ BACKEND
 Backend of this app is built in NodeJS 
 
 ** 𝐍𝐨𝐝𝐞𝐉𝐒 **
-![1200px-Node js_logo svg](https://user-images.githubusercontent.com/47331674/104933789-58ed9680-59cf-11eb-9618-fdb642dd111c.png)
+![1_MuVcoMPyJcq8G4qf5s3HGQ](https://user-images.githubusercontent.com/47331674/104934070-b550b600-59cf-11eb-8c05-47ee47088490.png)
 Node.js is an open-source, cross-platform, JavaScript runtime environment. 
 It executes JavaScript code outside of a browser.
 
